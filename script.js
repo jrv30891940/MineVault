@@ -1636,14 +1636,62 @@ const Forms = {
       }
     });
 
-    // Category select populate
-    const catSelect = document.getElementById('formModCategory');
+// Category select populate
+const catSelect = document.getElementById('formModCategory');
+catSelect.innerHTML = ''; // Limpia opciones primero
+STATE.categories.forEach(cat => {
+  const opt = document.createElement('option');
+  opt.value = cat.slug;
+  opt.textContent = cat.name;
+  catSelect.appendChild(opt);
+});
+
+// Mostrar formulario de nueva categoría
+const showCatFormBtn = document.getElementById('showNewCategoryForm');
+const newCatWrap = document.getElementById('newCategoryWrap');
+showCatFormBtn.onclick = () => { newCatWrap.style.display = 'block'; };
+
+// Agregar nueva categoría
+document.getElementById('addCategoryBtn').onclick = async () => {
+  const name = document.getElementById('newCategoryName').value.trim();
+  const icon = document.getElementById('newCategoryIcon').value.trim();
+  const slug = document.getElementById('newCategorySlug').value.trim();
+  if (!name || !slug) {
+    alert('Nombre y slug son obligatorios');
+    return;
+  }
+  try {
+    // Paso 1: guardar en Supabase o en mock:
+    let nuevaCat = { name, icon, slug };
+    if (!supabaseClient || CONFIG.supabase.url.includes('YOUR_PROJECT')) {
+      MOCK.categories.push(nuevaCat);
+      STATE.categories.push(nuevaCat);
+    } else {
+      const { error } = await supabaseClient.from('categories').insert(nuevaCat);
+      if (error) throw error;
+      // Recarga categorías desde DB
+      STATE.categories = await DB.getCategories();
+    }
+    // Paso 2: refrescar select
+    catSelect.innerHTML = '';
     STATE.categories.forEach(cat => {
       const opt = document.createElement('option');
       opt.value = cat.slug;
       opt.textContent = cat.name;
       catSelect.appendChild(opt);
     });
+    // Selecciona la nueva
+    catSelect.value = slug;
+    // Limpia formulario
+    document.getElementById('newCategoryName').value = '';
+    document.getElementById('newCategoryIcon').value = '';
+    document.getElementById('newCategorySlug').value = '';
+    newCatWrap.style.display = 'none';
+    alert('Categoría agregada correctamente.');
+  } catch (e) {
+    alert('Error al agregar categoría: ' + e.message);
+  }
+};
   },
 
   initEditor(textareaId, previewId) {
