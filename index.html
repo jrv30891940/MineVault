@@ -562,6 +562,15 @@
             <select id="formModCategory" class="form-input select-input">
               <option value="">Seleccionar…</option>
             </select>
+            <button id="showNewCategoryForm" type="button" style="margin-top:8px;margin-bottom:4px;width:100%">+ Nueva categoría</button>
+
+<!-- Formulario oculto para crear una nueva categoría -->
+<div id="newCategoryWrap" style="display:none;gap:4px;flex-direction:column;margin-bottom:8px;">
+  <input type="text" id="newCategoryName" placeholder="Nombre de la nueva categoría" style="width:100%;margin-bottom:4px;">
+  <input type="text" id="newCategoryIcon" placeholder="Icono (emoji, opcional)" style="width:100%;margin-bottom:4px;">
+  <input type="text" id="newCategorySlug" placeholder="Slug (único, sin acentos ni espacios)" style="width:100%;margin-bottom:4px;">
+  <button id="addCategoryBtn" type="button" style="width:100%;">Agregar categoría</button>
+</div>
           </div>
           <div class="form-group">
             <label class="form-label" for="formModVersion">Versión MC</label>
