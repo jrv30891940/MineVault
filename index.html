@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MineVault – El hub definitivo de mods, skins y guías para Minecraft" />
+  <meta name="theme-color" content="#0a0c0f" />
+  <title>MineVault – Mods, Skins & Guías Minecraft</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Oxanium:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="home">
+
+  <!-- ============================================================
+       OVERLAY DE CARGA
+  ============================================================ -->
+  <div id="loader" class="loader" aria-hidden="true">
+    <div class="loader__inner">
+      <div class="loader__logo">
+        <span class="pixel-text">MineVault</span>
+        <div class="loader__bar"><div class="loader__fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       OVERLAY GENERAL (modal, admin, etc.)
+  ============================================================ -->
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       NAVBAR
+  ============================================================ -->
+  <header class="navbar" id="navbar">
+    <nav class="navbar__inner container" role="navigation" aria-label="Navegación principal">
+      <a href="#" class="navbar__brand" aria-label="MineVault inicio">
+        <span class="brand__icon" aria-hidden="true">⛏</span>
+        <span class="brand__name pixel-text">MineVault</span>
+      </a>
+
+      <div class="navbar__links" id="navLinks" role="list">
+        <a href="#" class="nav-link active" data-section="home" role="listitem">Inicio</a>
+        <a href="#mods" class="nav-link" data-section="mods" role="listitem">Mods</a>
+        <a href="#skins" class="nav-link" data-section="skins" role="listitem">Skins</a>
+        <a href="#wiki" class="nav-link" data-section="wiki" role="listitem">Wiki</a>
+      </div>
+
+      <div class="navbar__actions">
+        <button class="btn-icon search-toggle" id="searchToggle" aria-label="Abrir búsqueda" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <button class="btn-icon hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false">
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Search Expandable -->
+    <div class="navbar__search" id="navSearch" aria-hidden="true">
+      <div class="container">
+        <div class="search-bar">
+          <svg class="search-bar__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input
+            type="search"
+            id="globalSearch"
+            class="search-bar__input"
+            placeholder="Buscar mods, skins, guías…"
+            autocomplete="off"
+            aria-label="Buscar contenido"
+          />
+          <kbd class="search-bar__hint">ESC</kbd>
+        </div>
+      </div>
+      <!-- Live Results -->
+      <div class="search-results container" id="searchResults" role="listbox" aria-label="Resultados de búsqueda"></div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="nav-drawer" id="navDrawer" aria-hidden="true" role="dialog" aria-label="Menú móvil">
+    <div class="nav-drawer__header">
+      <span class="pixel-text brand__name">MineVault</span>
+      <button class="btn-icon" id="closeDrawer" aria-label="Cerrar menú">✕</button>
+    </div>
+    <nav class="nav-drawer__links">
+      <a href="#" class="drawer-link" data-section="home">🏠 Inicio</a>
+      <a href="#mods" class="drawer-link" data-section="mods">🧱 Mods</a>
+      <a href="#skins" class="drawer-link" data-section="skins">👕 Skins</a>
+      <a href="#wiki" class="drawer-link" data-section="wiki">📚 Wiki</a>
+      <hr class="drawer-divider"/>
+      <a href="#admin" class="drawer-link drawer-link--admin" data-section="admin">🔐 Admin Panel</a>
+    </nav>
+  </div>
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+  <main id="mainContent">
+
+    <!-- ==================== HOME PAGE ==================== -->
+    <section id="page-home" class="page active">
+
+      <!-- HERO: Mod del Mes -->
+      <section class="hero-section" id="heroSection" aria-label="Mod del Mes">
+        <div class="hero__bg" id="heroBg" aria-hidden="true">
+          <div class="hero__particles" id="heroParticles"></div>
+          <div class="hero__gradient"></div>
+        </div>
+        <div class="hero__content container">
+          <div class="hero__badge">
+            <span class="badge badge--gold">⭐ Mod del Mes</span>
+          </div>
+          <h1 class="hero__title pixel-text" id="heroTitle">Cargando…</h1>
+          <p class="hero__subtitle" id="heroSubtitle"></p>
+          <div class="hero__meta" id="heroMeta"></div>
+          <div class="hero__actions">
+            <button class="btn btn--primary btn--lg" id="heroDownloadBtn" aria-label="Descargar Mod del Mes">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Descargar
+            </button>
+            <button class="btn btn--outline btn--lg" id="heroDetailBtn">Ver Detalles</button>
+          </div>
+        </div>
+        <div class="hero__image-wrap" id="heroImageWrap">
+          <div class="hero__image-frame">
+            <img id="heroImage" src="" alt="Mod del Mes" class="hero__image" loading="eager" />
+          </div>
+        </div>
+      </section>
+
+      <!-- STATS BAR -->
+      <div class="stats-bar" aria-label="Estadísticas de la plataforma">
+        <div class="container">
+          <div class="stats-bar__inner">
+            <div class="stat-item">
+              <span class="stat-item__value" id="statMods">–</span>
+              <span class="stat-item__label">Mods</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-item__value" id="statSkins">–</span>
+              <span class="stat-item__label">Skins</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-item__value" id="statDownloads">–</span>
+              <span class="stat-item__label">Descargas</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-item__value" id="statWiki">–</span>
+              <span class="stat-item__label">Artículos</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATEGORÍAS RÁPIDAS -->
+      <section class="categories-strip section-spacing" aria-label="Categorías">
+        <div class="container">
+          <div class="categories-strip__scroll" id="categoriesStrip" role="list">
+            <!-- JS rendered -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TOP 10 MODS -->
+      <section class="section-spacing" id="top10Section" aria-labelledby="top10Heading">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title" id="top10Heading">
+              <span class="pixel-text section-title__pixel">TOP</span>
+              <span class="section-title__main">10 Mods</span>
+            </h2>
+            <span class="section-title__badge badge badge--emerald">🔥 Populares</span>
+          </div>
+          <div class="top10-list" id="top10List" role="list">
+            <!-- JS rendered -->
+          </div>
+        </div>
+      </section>
+
+      <!-- MODS RECIENTES -->
+      <section class="section-spacing" id="recentSection" aria-labelledby="recentHeading">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title" id="recentHeading">
+              <span class="pixel-text section-title__pixel">NEW</span>
+              <span class="section-title__main">Recientes</span>
+            </h2>
+            <a href="#mods" class="btn btn--ghost btn--sm">Ver todos →</a>
+          </div>
+          <div class="mods-grid" id="recentGrid" role="list">
+            <!-- JS rendered -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SKINS SECTION (preview) -->
+      <section class="section-spacing skins-preview" id="skinsPreview" aria-labelledby="skinsHeading">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title" id="skinsHeading">
+              <span class="pixel-text section-title__pixel">👕</span>
+              <span class="section-title__main">Skins</span>
+            </h2>
+            <a href="#skins" class="btn btn--ghost btn--sm">Ver todos →</a>
+          </div>
+          <div class="skins-grid" id="skinsPreviewGrid" role="list">
+            <!-- JS rendered -->
+          </div>
+        </div>
+      </section>
+
+    </section>
+    <!-- /HOME -->
+
+
+    <!-- ==================== MODS PAGE ==================== -->
+    <section id="page-mods" class="page" aria-label="Todos los Mods">
+      <div class="page-hero page-hero--mods">
+        <div class="container">
+          <h1 class="pixel-text page-hero__title">MODS</h1>
+          <p class="page-hero__sub">Descubre los mejores mods para tu experiencia Minecraft</p>
+        </div>
+      </div>
+      <div class="container layout-sidebar">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="modsSidebar" aria-label="Filtros de mods">
+          <div class="sidebar__section">
+            <h3 class="sidebar__title">Categorías</h3>
+            <ul class="sidebar__cats" id="modCategoryList" role="list"></ul>
+          </div>
+          <div class="sidebar__section">
+            <h3 class="sidebar__title">Ordenar</h3>
+            <select class="select-input" id="sortMods" aria-label="Ordenar mods">
+              <option value="downloads">Más descargados</option>
+              <option value="date">Más recientes</option>
+              <option value="name">Nombre A–Z</option>
+            </select>
+          </div>
+          <div class="sidebar__section">
+            <h3 class="sidebar__title">Versión</h3>
+            <div class="version-filter" id="versionFilter">
+              <!-- JS rendered -->
+            </div>
+          </div>
+        </aside>
+
+        <!-- Content -->
+        <div class="content-area">
+          <div class="content-toolbar">
+            <div class="search-bar search-bar--inline">
+              <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="search" id="modsSearch" class="search-bar__input" placeholder="Buscar mods…" aria-label="Buscar mods" />
+            </div>
+            <button class="btn btn--ghost btn--sm filter-toggle-mobile" id="filterToggle" aria-expanded="false">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/></svg>
+              Filtros
+            </button>
+          </div>
+          <div class="results-info" id="modsCount"></div>
+          <div class="mods-grid mods-grid--full" id="modsGrid" role="list">
+            <!-- JS rendered -->
+          </div>
+          <div class="load-more-wrap">
+            <button class="btn btn--outline" id="loadMoreMods" style="display:none">Cargar más</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /MODS -->
+
+
+    <!-- ==================== SKINS PAGE ==================== -->
+    <section id="page-skins" class="page" aria-label="Skins de Minecraft">
+      <div class="page-hero page-hero--skins">
+        <div class="container">
+          <h1 class="pixel-text page-hero__title">SKINS</h1>
+          <p class="page-hero__sub">Personaliza tu personaje con los mejores skins</p>
+        </div>
+      </div>
+      <div class="container">
+        <div class="content-toolbar">
+          <div class="search-bar search-bar--inline">
+            <svg class="search-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="search" id="skinsSearch" class="search-bar__input" placeholder="Buscar skins…" aria-label="Buscar skins" />
+          </div>
+        </div>
+        <div class="skins-grid skins-grid--full" id="skinsGrid" role="list">
+          <!-- JS rendered -->
+        </div>
+      </div>
+    </section>
+    <!-- /SKINS -->
+
+
+    <!-- ==================== WIKI PAGE ==================== -->
+    <section id="page-wiki" class="page" aria-label="Wiki de Minecraft">
+      <div class="page-hero page-hero--wiki">
+        <div class="container">
+          <h1 class="pixel-text page-hero__title">WIKI</h1>
+          <p class="page-hero__sub">Guías, tutoriales y todo lo que necesitas saber</p>
+        </div>
+      </div>
+      <div class="container layout-sidebar">
+        <!-- Wiki Sidebar (desktop) / Accordion (mobile) -->
+        <aside class="sidebar" id="wikiSidebar" aria-label="Categorías Wiki">
+          <div class="sidebar__section">
+            <h3 class="sidebar__title">Temas</h3>
+            <ul class="wiki-toc" id="wikiToc" role="list"></ul>
+          </div>
+        </aside>
+
+        <!-- Wiki Content -->
+        <div class="content-area wiki-content-area">
+          <div class="wiki-accordion-header" id="wikiAccordionHeader" aria-expanded="false">
+            <span>📚 Categorías</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="wiki-accordion-body" id="wikiAccordionBody" aria-hidden="true">
+            <!-- Mobile TOC -->
+          </div>
+
+          <div id="wikiArticleList" class="wiki-article-list">
+            <!-- JS rendered -->
+          </div>
+          <div id="wikiArticleView" class="wiki-article-view" style="display:none">
+            <button class="btn btn--ghost btn--sm wiki-back" id="wikiBack">← Volver</button>
+            <article class="wiki-article" id="wikiArticle"></article>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /WIKI -->
+
+
+    <!-- ==================== ADMIN PAGE ==================== -->
+    <section id="page-admin" class="page" aria-label="Panel de Administración">
+      <!-- Admin Login -->
+      <div class="admin-login" id="adminLogin">
+        <div class="admin-login__card">
+          <div class="admin-login__header">
+            <span class="pixel-text admin-login__logo">MineVault</span>
+            <p class="admin-login__sub">Panel de Administración</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adminEmail">Email</label>
+            <input type="email" id="adminEmail" class="form-input" placeholder="admin@minevault.com" autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adminPassword">Contraseña</label>
+            <div class="input-wrap">
+              <input type="password" id="adminPassword" class="form-input" placeholder="••••••••" autocomplete="current-password" />
+              <button class="input-toggle-pw" id="togglePassword" aria-label="Mostrar/ocultar contraseña" type="button">👁</button>
+            </div>
+          </div>
+          <button class="btn btn--primary btn--full" id="adminLoginBtn">
+            Entrar al Panel
+          </button>
+          <p class="admin-login__error" id="loginError" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <!-- Admin Dashboard -->
+      <div class="admin-dashboard" id="adminDashboard" style="display:none">
+        <!-- Admin Nav -->
+        <div class="admin-nav">
+          <div class="container">
+            <div class="admin-nav__inner">
+              <span class="pixel-text admin-nav__brand">⚡ Admin</span>
+              <div class="admin-nav__tabs" role="tablist">
+                <button class="admin-tab active" data-tab="mods" role="tab" aria-selected="true">🧱 Mods</button>
+                <button class="admin-tab" data-tab="skins" role="tab" aria-selected="false">👕 Skins</button>
+                <button class="admin-tab" data-tab="wiki" role="tab" aria-selected="false">📚 Wiki</button>
+              </div>
+              <button class="btn btn--ghost btn--sm" id="adminLogout">Salir</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="container">
+          <div class="admin-stats" id="adminStats">
+            <!-- JS rendered -->
+          </div>
+
+          <!-- Mods Tab -->
+          <div class="admin-panel active" id="admin-tab-mods">
+            <div class="admin-panel__header">
+              <h2 class="admin-panel__title">Gestión de Mods</h2>
+              <button class="btn btn--primary" id="newModBtn">+ Nuevo Mod</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" id="adminModsTable">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Descargas</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="adminModsBody">
+                  <!-- JS rendered -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Skins Tab -->
+          <div class="admin-panel" id="admin-tab-skins">
+            <div class="admin-panel__header">
+              <h2 class="admin-panel__title">Gestión de Skins</h2>
+              <button class="btn btn--primary" id="newSkinBtn">+ Nueva Skin</button>
+            </div>
+            <div class="skins-grid skins-grid--admin" id="adminSkinsGrid">
+              <!-- JS rendered -->
+            </div>
+          </div>
+
+          <!-- Wiki Tab -->
+          <div class="admin-panel" id="admin-tab-wiki">
+            <div class="admin-panel__header">
+              <h2 class="admin-panel__title">Gestión de Wiki</h2>
+              <button class="btn btn--primary" id="newWikiBtn">+ Nuevo Artículo</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" id="adminWikiTable">
+                <thead>
+                  <tr>
+                    <th>Título</th>
+                    <th>Categoría</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="adminWikiBody">
+                  <!-- JS rendered -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /ADMIN -->
+
+  </main>
+  <!-- /MAIN -->
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <span class="pixel-text footer__logo">MineVault</span>
+          <p class="footer__tagline">El hub definitivo de Minecraft</p>
+          <div class="footer__socials">
+            <a href="#" class="social-btn" aria-label="Discord">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="GitHub">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+            <a href="#" class="social-btn" aria-label="YouTube">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__col-title">Contenido</h4>
+          <ul class="footer__links">
+            <li><a href="#mods">Mods</a></li>
+            <li><a href="#skins">Skins</a></li>
+            <li><a href="#wiki">Wiki</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__col-title">Comunidad</h4>
+          <ul class="footer__links">
+            <li><a href="#">Discord</a></li>
+            <li><a href="#">GitHub</a></li>
+            <li><a href="#">Contribuir</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__col-title">Legal</h4>
+          <ul class="footer__links">
+            <li><a href="#">Privacidad</a></li>
+            <li><a href="#">Términos</a></li>
+            <li><a href="#">Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© 2025 MineVault. Hecho con ❤️ para la comunidad Minecraft.</p>
+        <p class="footer__disclaimer">No afiliado con Mojang Studios.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       MODALS
+  ============================================================ -->
+
+  <!-- Mod Detail Modal -->
+  <div class="modal" id="modModal" role="dialog" aria-modal="true" aria-labelledby="modalModTitle" aria-hidden="true">
+    <div class="modal__inner">
+      <button class="modal__close" id="closeModModal" aria-label="Cerrar modal">✕</button>
+      <div class="modal__hero">
+        <img id="modalModImage" src="" alt="" class="modal__hero-img" />
+        <div class="modal__hero-overlay"></div>
+        <div class="modal__hero-content">
+          <div id="modalModCategories" class="tag-list"></div>
+          <h2 class="pixel-text modal__mod-title" id="modalModTitle"></h2>
+          <div class="modal__mod-meta" id="modalModMeta"></div>
+        </div>
+      </div>
+      <div class="modal__body">
+        <div class="modal__description" id="modalModDescription"></div>
+        <div class="modal__actions">
+          <button class="btn btn--primary btn--lg btn--full download-btn" id="downloadBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Descargar Mod
+          </button>
+          <div class="download-counter" id="downloadCounter" style="display:none" aria-live="polite">
+            Preparando descarga en <span id="countdownNum">5</span>s…
+          </div>
+        </div>
+        <div class="modal__info-grid" id="modalInfoGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mod Form Modal (Admin) -->
+  <div class="modal modal--form" id="modFormModal" role="dialog" aria-modal="true" aria-labelledby="formModalTitle" aria-hidden="true">
+    <div class="modal__inner modal__inner--form">
+      <div class="modal__form-header">
+        <h2 class="modal__form-title" id="formModalTitle">Nuevo Mod</h2>
+        <button class="modal__close" id="closeFormModal" aria-label="Cerrar formulario">✕</button>
+      </div>
+      <div class="modal__form-body">
+        <div class="form-grid">
+          <div class="form-group form-group--full">
+            <label class="form-label" for="formModName">Nombre del Mod *</label>
+            <input type="text" id="formModName" class="form-input" placeholder="Ej: OptiFine 1.20.4" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formModCategory">Categoría *</label>
+            <select id="formModCategory" class="form-input select-input">
+              <option value="">Seleccionar…</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formModVersion">Versión MC</label>
+            <input type="text" id="formModVersion" class="form-input" placeholder="1.20.4" />
+          </div>
+          <div class="form-group form-group--full">
+            <label class="form-label" for="formModShort">Descripción corta *</label>
+            <input type="text" id="formModShort" class="form-input" placeholder="Breve descripción del mod…" />
+          </div>
+          <div class="form-group form-group--full">
+            <label class="form-label" for="formModDesc">Descripción completa (Markdown)</label>
+            <div class="editor-wrap">
+              <div class="editor-tabs">
+                <button class="editor-tab active" data-editor="write">Escribir</button>
+                <button class="editor-tab" data-editor="preview">Vista previa</button>
+              </div>
+              <textarea id="formModDesc" class="form-input form-input--textarea" placeholder="# Mi Mod&#10;&#10;Descripción detallada en **Markdown**…" rows="8"></textarea>
+              <div id="formModDescPreview" class="markdown-preview" style="display:none"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formModDownloadUrl">URL de Descarga *</label>
+            <input type="url" id="formModDownloadUrl" class="form-input" placeholder="https://…" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formModTags">Tags (separados por coma)</label>
+            <input type="text" id="formModTags" class="form-input" placeholder="performance, shader, visual" />
+          </div>
+          <div class="form-group form-group--full">
+            <label class="form-label">Imagen del Mod</label>
+            <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Subir imagen">
+              <div class="upload-zone__placeholder" id="uploadPlaceholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                <span>Arrastra una imagen o toca para seleccionar</span>
+              </div>
+              <img id="uploadPreview" class="upload-preview" src="" alt="" style="display:none" />
+              <input type="file" id="formModImage" accept="image/*" class="upload-input" aria-label="Seleccionar imagen" />
+            </div>
+          </div>
+          <div class="form-group form-group--full">
+            <label class="check-label">
+              <input type="checkbox" id="formModFeatured" class="check-input" />
+              <span class="check-custom"></span>
+              ⭐ Marcar como Mod del Mes
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn--ghost" id="cancelFormBtn">Cancelar</button>
+          <button class="btn btn--primary" id="saveModBtn">Guardar Mod</button>
+        </div>
+        <p class="form-status" id="formStatus" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wiki Form Modal (Admin) -->
+  <div class="modal modal--form" id="wikiFormModal" role="dialog" aria-modal="true" aria-labelledby="wikiFormTitle" aria-hidden="true">
+    <div class="modal__inner modal__inner--form">
+      <div class="modal__form-header">
+        <h2 class="modal__form-title" id="wikiFormTitle">Nuevo Artículo</h2>
+        <button class="modal__close" id="closeWikiFormModal" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal__form-body">
+        <div class="form-grid">
+          <div class="form-group form-group--full">
+            <label class="form-label" for="formWikiTitle">Título *</label>
+            <input type="text" id="formWikiTitle" class="form-input" placeholder="Ej: Cómo instalar mods" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formWikiCategory">Categoría *</label>
+            <input type="text" id="formWikiCategory" class="form-input" placeholder="Ej: Guías básicas" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formWikiOrder">Orden</label>
+            <input type="number" id="formWikiOrder" class="form-input" value="0" min="0" />
+          </div>
+          <div class="form-group form-group--full">
+            <label class="form-label" for="formWikiContent">Contenido (Markdown) *</label>
+            <div class="editor-wrap">
+              <div class="editor-tabs">
+                <button class="editor-tab active" data-editor="write">Escribir</button>
+                <button class="editor-tab" data-editor="preview">Vista previa</button>
+              </div>
+              <textarea id="formWikiContent" class="form-input form-input--textarea" rows="12" placeholder="# Título&#10;&#10;Escribe el contenido en **Markdown**…"></textarea>
+              <div id="formWikiPreview" class="markdown-preview" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn--ghost" id="cancelWikiBtn">Cancelar</button>
+          <button class="btn btn--primary" id="saveWikiBtn">Guardar Artículo</button>
+        </div>
+        <p class="form-status" id="wikiFormStatus" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
